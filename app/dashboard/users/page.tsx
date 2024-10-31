@@ -76,16 +76,16 @@ export default function UsersPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div>
+      <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Users</h1>
-        <Link
-          href="/dashboard/users/create" // Ensure the href points to the correct create user route
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center gap-2"
+        <button
+          onClick={() => setIsCreateModalOpen(true)}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center gap-2"
         >
           <AiOutlinePlus className="w-5 h-5" />
           Create User
-        </Link>
+        </button>
       </div>
 
       <div className="bg-white rounded-lg shadow overflow-hidden">

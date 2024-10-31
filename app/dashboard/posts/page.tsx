@@ -5,6 +5,7 @@ import { useUser } from '../../contexts/UserContext';
 import { useRouter } from 'next/navigation';
 import { AiOutlineEdit, AiOutlinePlus } from 'react-icons/ai';
 import EditPostModal from './EditPostModal';
+import Link from 'next/link';
 
 interface Author {
   id: number;
@@ -81,15 +82,14 @@ export default function Posts() {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold">Posts</h1>
-          <p className="text-gray-600 mt-1">Total posts: {posts.length}</p>
         </div>
-        <button
-          onClick={() => router.push('/dashboard/posts/new')}
+        <Link
+          href="/dashboard/posts/new"
           className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
         >
           <AiOutlinePlus className="w-5 h-5" />
           Add New
-        </button>
+        </Link>
       </div>
 
       <div className="bg-white rounded-lg shadow overflow-hidden">
