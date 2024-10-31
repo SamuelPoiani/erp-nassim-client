@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from './contexts/UserContext';
+import { toast } from 'react-toastify';
 
 export default function Home() {
   const [email, setEmail] = useState('');
@@ -50,7 +51,9 @@ export default function Home() {
           window.location.href = '/dashboard';
         }
       } else {
-        alert('Login failed');
+        //use toast to show error message
+        const errorData = await response.json();
+        toast.error(errorData.message || 'Login failed');
       }
     } catch (error) {
       console.error('Login error:', error);

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { AiOutlineEdit, AiOutlinePlus } from 'react-icons/ai';
 import EditUserModal from '@/app/dashboard/users/EditUserModal';
 import CreateUserModal from '@/app/dashboard/users/CreateUserModal';
+import Link from 'next/link';
 
 interface User {
   id: number;
@@ -78,13 +79,13 @@ export default function UsersPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-800">Users</h1>
-        <button
-          onClick={() => setIsCreateModalOpen(true)}
+        <Link
+          href="/dashboard/users/create" // Ensure the href points to the correct create user route
           className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center gap-2"
         >
           <AiOutlinePlus className="w-5 h-5" />
           Create User
-        </button>
+        </Link>
       </div>
 
       <div className="bg-white rounded-lg shadow overflow-hidden">

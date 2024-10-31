@@ -2,11 +2,11 @@
 
 import { useUser } from '../contexts/UserContext';
 import { useState, useEffect } from 'react';
-import { 
-  AiOutlineFileText, 
-  AiOutlineUser, 
-  AiOutlineMail 
-} from 'react-icons/ai';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { User, Users, FileText, BarChart2 } from 'lucide-react';
+import { Button } from "@/components/ui/button"
+import Link from 'next/link';
+import { PlusCircle, Settings, List } from 'lucide-react'
 
 interface Stats {
   totalPosts: number;
@@ -47,9 +47,7 @@ export default function Dashboard() {
     fetchStats();
   }, []);
 
-  if (!user) {
-    return null;
-  }
+  if (!user) return null;
 
   if (loading) {
     return (
@@ -60,105 +58,90 @@ export default function Dashboard() {
   }
 
   const statCards = [
-    {
-      title: 'Total Posts',
+    { 
+      title: 'Total Posts', 
       value: stats?.totalPosts || 0,
-      icon: AiOutlineFileText,
-      color: 'bg-blue-500',
-      textColor: 'text-blue-500',
-      bgColor: 'bg-blue-50'
+      icon: <FileText size={24} className="text-blue-500" />,
+      change: '+12%'
     },
-    {
-      title: 'Newsletter Subscribers',
+    { 
+      title: 'Newsletter Subscribers', 
       value: stats?.totalNewsletterSubscribers || 0,
-      icon: AiOutlineMail,
-      color: 'bg-green-500',
-      textColor: 'text-green-500',
-      bgColor: 'bg-green-50'
+      icon: <BarChart2 size={24} className="text-green-500" />,
+      change: '+25%'
     },
-    {
-      title: 'Total Users',
+    { 
+      title: 'Total Users', 
       value: stats?.totalUsers || 0,
-      icon: AiOutlineUser,
-      color: 'bg-purple-500',
-      textColor: 'text-purple-500',
-      bgColor: 'bg-purple-50'
+      icon: <Users size={24} className="text-orange-500" />,
+      change: '+8%'
     }
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Welcome Section */}
-      <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
-        <h2 className="text-2xl font-bold text-gray-800">Welcome back, {user.name}! 👋</h2>
-        <p className="text-gray-600 mt-2">Here's what's happening with your blog today.</p>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {statCards.map((stat, index) => (
-          <div
-            key={index}
-            className="bg-white rounded-lg p-6 shadow-sm border border-gray-100 transition-all duration-200 hover:shadow-md"
-          >
-            <div className="flex items-center justify-between">
-              <div className={`${stat.bgColor} p-3 rounded-lg`}>
-                <stat.icon className={`w-6 h-6 ${stat.textColor}`} />
-              </div>
-              <span className="text-gray-500 text-sm">Last 30 days</span>
-            </div>
-            
-            <div className="mt-4">
-              <h3 className="text-gray-600 text-sm font-medium">
-                {stat.title}
-              </h3>
-              <p className="text-3xl font-bold text-gray-800 mt-1">
-                {stat.value.toLocaleString()}
-              </p>
-            </div>
-          </div>
+    <div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+        {statCards.map((card, index) => (
+          <Card key={index}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
+              {card.icon}
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{card.value}</div>
+              <p className="text-xs text-muted-foreground">{card.change} from last month</p>
+            </CardContent>
+          </Card>
         ))}
       </div>
 
-      {/* User Info Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
-          <h3 className="font-semibold text-gray-800 mb-4">Account Information</h3>
-          <div className="space-y-3">
-            <p className="text-sm">
-              <span className="text-gray-600 font-medium">Email:</span>{' '}
-              <span className="text-gray-800">{user.email}</span>
-            </p>
-            <p className="text-sm">
-              <span className="text-gray-600 font-medium">Member since:</span>{' '}
-              <span className="text-gray-800">
+        <Card>
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <Link href="/dashboard/posts/new" passHref>
+              <Button variant="secondary" className="w-full justify-start">
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Create New Post
+              </Button>
+            </Link>
+            <Link href="/dashboard/posts" passHref>
+              <Button variant="secondary" className="w-full justify-start">
+                <List className="mr-2 h-4 w-4" />
+                View All Posts
+              </Button>
+            </Link>
+            <Link href="/dashboard/settings" passHref>
+              <Button variant="secondary" className="w-full justify-start">
+                <Settings className="mr-2 h-4 w-4" />
+                Manage Settings
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Account Information</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <div className="flex flex-col space-y-1">
+              <span className="text-sm font-medium">Email</span>
+              <span className="text-sm text-muted-foreground">{user.email}</span>
+            </div>
+            <div className="flex flex-col space-y-1">
+              <span className="text-sm font-medium">Member since</span>
+              <span className="text-sm text-muted-foreground">
                 {new Date(user.createdAt).toLocaleDateString('en-US', {
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric'
                 })}
               </span>
-            </p>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
-          <h3 className="font-semibold text-gray-800 mb-4">Quick Actions</h3>
-          <div className="space-y-2">
-            <button
-              onClick={() => window.location.href = '/dashboard/posts/new'}
-              className="w-full text-left px-4 py-2 rounded-lg text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors duration-200"
-            >
-              Create New Post
-            </button>
-            <button
-              onClick={() => window.location.href = '/dashboard/posts'}
-              className="w-full text-left px-4 py-2 rounded-lg text-purple-600 bg-purple-50 hover:bg-purple-100 transition-colors duration-200"
-            >
-              View All Posts
-            </button>
-          </div>
-        </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
