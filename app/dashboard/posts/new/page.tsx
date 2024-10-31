@@ -138,16 +138,6 @@ export default function NewPost() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="mb-6 flex items-center">
-        <button
-          onClick={() => router.back()}
-          className="flex items-center text-gray-600 hover:text-gray-900"
-        >
-          <AiOutlineArrowLeft className="w-5 h-5 mr-2" />
-          Back to Posts
-        </button>
-      </div>
-
       <div className="bg-white rounded-lg shadow p-6">
         <h1 className="text-2xl font-bold mb-6">Create New Post</h1>
 
@@ -291,7 +281,7 @@ export default function NewPost() {
             <textarea
               value={postData.content}
               onChange={(e) => setPostData(prev => ({ ...prev, content: e.target.value }))}
-              className="w-full p-2 border rounded min-h-[300px]"
+              className="w-full p-2 border rounded min-h-[190px]"
               required
             />
           </div>

@@ -3,26 +3,8 @@
 import { useUser } from '../contexts/UserContext';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Settings } from 'lucide-react';
-import {
-  Menu,
-  Bell,
-  Mail,
-  Calendar,
-  User,
-  Box,
-  FileText,
-  Users,
-  ShoppingCart,
-  MessageSquare,
-  CheckSquare,
-  BarChart2,
-  Home,
-  ChevronDown,
-  Power
-} from 'lucide-react';
+import { Settings, Menu, Sidebar as SidebarIcon, Bell, Mail, Calendar, User, FileText, Users, Home, ChevronDown, Power } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,6 +24,7 @@ export default function DashboardLayout({
   const { user, setUser, loading } = useUser();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isIconOnly, setIsIconOnly] = useState(false);
 
   const handleLogout = async () => {
     document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
@@ -76,13 +59,20 @@ export default function DashboardLayout({
 
       {/* Sidebar */}
       <aside 
-        className={`fixed md:static bg-[#283046] text-white w-64 min-h-screen p-4 
-          transition-transform duration-200 ease-in-out z-30
+        className={`fixed md:static bg-[#283046] text-white ${isIconOnly ? 'w-16' : 'w-64'} min-h-screen p-4 
+          transition-all duration-200 ease-in-out z-30
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
           md:translate-x-0`}
       >
-        <div className="flex items-center mb-8">
-          <img src="https://raw.githubusercontent.com/Nassim-Tecnologia/brand-assets/refs/heads/main/logo-marca-primary-without-bg.png" alt="Logo" className="h-8" />
+        <div className={`flex items-center mb-8 ${isIconOnly ? 'justify-center' : ''}`}>
+          <img 
+            src={isIconOnly 
+              ? "https://raw.githubusercontent.com/Nassim-Tecnologia/brand-assets/refs/heads/main/logo-light-without-bg.png"
+              : "https://raw.githubusercontent.com/Nassim-Tecnologia/brand-assets/refs/heads/main/logo-marca-primary-without-bg.png"
+            }
+            alt="Logo" 
+            className={`${isIconOnly ? 'h-8 w-8' : 'h-8'}`} 
+          />
         </div>
         <nav>
           <ul className="space-y-2">
@@ -90,10 +80,13 @@ export default function DashboardLayout({
               <li key={index}>
                 <Link 
                   href={item.href}
-                  className="flex items-center space-x-3 p-2 rounded-lg hover:bg-[#161d31]"
+                  className={`flex items-center ${isIconOnly ? 'justify-center' : ''} p-2 rounded-lg hover:bg-[#161d31] ${
+                    isIconOnly ? 'px-2' : 'space-x-3'
+                  }`}
+                  title={isIconOnly ? item.label : ''}
                 >
                   {item.icon}
-                  <span>{item.label}</span>
+                  {!isIconOnly && <span>{item.label}</span>}
                 </Link>
               </li>
             ))}
@@ -106,11 +99,24 @@ export default function DashboardLayout({
         {/* Navbar */}
         <header className="bg-white shadow-sm">
           <div className="flex items-center justify-between p-4">
-            <div className="flex items-center">
-              <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-gray-500 focus:outline-none focus:text-gray-700 md:hidden">
+            <div className="flex items-center space-x-2">
+              <button 
+                onClick={() => setSidebarOpen(!sidebarOpen)} 
+                className="text-gray-500 focus:outline-none focus:text-gray-700 md:hidden"
+              >
                 <Menu size={24} />
               </button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsIconOnly(!isIconOnly)}
+                className="hidden md:flex"
+                title={isIconOnly ? "Expand sidebar" : "Collapse sidebar"}
+              >
+                <SidebarIcon size={20} />
+              </Button>
             </div>
+            
             <div className="flex items-center space-x-4">
               <Button variant="ghost" size="icon">
                 <Bell size={20} />
@@ -134,7 +140,7 @@ export default function DashboardLayout({
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
-                    <DropdownMenuItem asChild>
+                    <DropdownMenuItem className='cursor-pointer' asChild>
                       <Link href="/dashboard/settings" className="w-full">
                         <Settings className="mr-2 h-4 w-4" />
                         <span>Settings</span>
@@ -142,7 +148,7 @@ export default function DashboardLayout({
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>
+                  <DropdownMenuItem className='cursor-pointer' onClick={handleLogout}>
                     <Power className="mr-2 h-4 w-4" />
                     <span>Log out</span>
                   </DropdownMenuItem>

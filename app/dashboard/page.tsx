@@ -89,7 +89,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{card.value}</div>
-              <p className="text-xs text-muted-foreground">{card.change} from last month</p>
+              {/* <p className="text-xs text-muted-foreground">{card.change} from last month</p> */}
             </CardContent>
           </Card>
         ))}
@@ -100,7 +100,7 @@ export default function Dashboard() {
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2">
+          <CardContent className="flex flex-col space-y-3">
             <Link href="/dashboard/posts/new" passHref>
               <Button variant="secondary" className="w-full justify-start">
                 <PlusCircle className="mr-2 h-4 w-4" />
