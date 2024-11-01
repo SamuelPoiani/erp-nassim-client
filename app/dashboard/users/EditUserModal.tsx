@@ -54,7 +54,7 @@ export default function EditUserModal({ user, isOpen, onClose, onUpdate }: EditU
         Object.entries(formData).filter(([_, value]) => value !== '')
       );
 
-      const response = await fetch(`http://localhost:3001/api/users/${user?.id}`, {
+      const response = await fetch(`http://localhost:3001/api/users/edit/${user?.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

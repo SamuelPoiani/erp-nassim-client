@@ -12,12 +12,14 @@ import { Separator } from "@/components/ui/separator"
 interface FormState {
   values: {
     name: string;
+    email: string;
     currentPassword: string;
     newPassword: string;
     confirmPassword: string;
   };
   original: {
     name: string;
+    email: string;
   };
   dirty: {
     profile: boolean;
@@ -32,12 +34,14 @@ export default function Settings() {
   const [formState, setFormState] = useState<FormState>({
     values: {
       name: user?.name || '',
+      email: user?.email || '',
       currentPassword: '',
       newPassword: '',
       confirmPassword: ''
     },
     original: {
-      name: user?.name || ''
+      name: user?.name || '',
+      email: user?.email || ''
     },
     dirty: {
       profile: false,
@@ -51,10 +55,12 @@ export default function Settings() {
       setFormState(prev => ({
         values: {
           ...prev.values,
-          name: user.name || ''
+          name: user.name || '',
+          email: user.email || ''
         },
         original: {
-          name: user.name || ''
+          name: user.name || '',
+          email: user.email || ''
         },
         dirty: {
           profile: false,
@@ -75,10 +81,10 @@ export default function Settings() {
       };
 
       // Update dirty states
-      if (field === 'name') {
+      if (field === 'name' || field === 'email') {
         newState.dirty = {
           ...prev.dirty,
-          profile: newState.values.name !== prev.original.name
+          profile: newState.values.name !== prev.original.name || newState.values.email !== prev.original.email
         };
       } else if (['currentPassword', 'newPassword', 'confirmPassword'].includes(field)) {
         newState.dirty = {
@@ -99,32 +105,37 @@ export default function Settings() {
         .find(row => row.startsWith('token='))
         ?.split('=')[1];
 
-      const response = await fetch(`http://localhost:3001/api/users/${user?.id}`, {
+      const response = await fetch(`http://localhost:3001/api/users/edit/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ name: formState.values.name })
+        body: JSON.stringify({ 
+          name: formState.values.name,
+          email: formState.values.email 
+        })
       });
 
-      if (response.ok) {
-        await updateUserData();
-        setFormState(prev => ({
-          ...prev,
-          original: {
-            ...prev.original,
-            name: prev.values.name
-          },
-          dirty: {
-            ...prev.dirty,
-            profile: false
-          }
-        }));
-        toast.success('Profile updated successfully');
-      } else {
-        toast.error('Failed to update profile');
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast.error(errorData.message || 'Failed to update profile');
+        return;
       }
+
+      await updateUserData();
+      setFormState(prev => ({
+        ...prev,
+        original: {
+          name: prev.values.name,
+          email: prev.values.email
+        },
+        dirty: {
+          ...prev.dirty,
+          profile: false
+        }
+      }));
+      toast.success('Profile updated successfully');
     } catch (error) {
       console.error('Error updating profile:', error);
       toast.error('Error updating profile');
@@ -146,39 +157,42 @@ export default function Settings() {
         .find(row => row.startsWith('token='))
         ?.split('=')[1];
 
-      const response = await fetch(`http://localhost:3001/api/users/${user?.id}`, {
+      const response = await fetch(`http://localhost:3001/api/users/edit/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          currentPassword: formState.values.currentPassword,
-          password: formState.values.newPassword
+          oldPassword: formState.values.currentPassword,
+          newPassword: formState.values.newPassword
         })
       });
 
-      if (response.ok) {
-        toast.success('Password updated successfully');
-        setFormState(prev => ({
-          ...prev,
-          values: {
-            ...prev.values,
-            currentPassword: '',
-            newPassword: '',
-            confirmPassword: ''
-          },
-          dirty: {
-            ...prev.dirty,
-            password: false
-          }
-        }));
-      } else {
-        toast.error('Failed to update password');
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast.error(data.message || 'Failed to update password');
+        return;
       }
+
+      toast.success('Password updated successfully');
+      setFormState(prev => ({
+        ...prev,
+        values: {
+          ...prev.values,
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: ''
+        },
+        dirty: {
+          ...prev.dirty,
+          password: false
+        }
+      }));
     } catch (error) {
       console.error('Error updating password:', error);
-      toast.error('Error updating password');
+      toast.error('An unexpected error occurred');
     } finally {
       setLoading(false);
     }
@@ -220,7 +234,11 @@ export default function Settings() {
                 Email Address
               </label>
               <div className="flex gap-2">
-                <Input value={user?.email || ''} disabled />
+                <Input 
+                  value={formState.values.email}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  placeholder="Enter your email"
+                />
                 <Button variant="ghost" size="icon" disabled>
                   <Mail className="h-4 w-4" />
                 </Button>
