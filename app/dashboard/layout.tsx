@@ -32,10 +32,6 @@ export default function DashboardLayout({
     router.push('/');
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
   if (!user) {
     return null;
   }
@@ -59,19 +55,19 @@ export default function DashboardLayout({
 
       {/* Sidebar */}
       <aside 
-        className={`fixed md:static bg-[#283046] text-white ${isIconOnly ? 'w-16' : 'w-64'} min-h-screen p-4 
+        className={`fixed md:static bg-[#283046] text-white ${isIconOnly ? 'w-17' : 'w-64'} min-h-screen p-4 
           transition-all duration-200 ease-in-out z-30
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
           md:translate-x-0`}
       >
-        <div className={`flex items-center mb-8 ${isIconOnly ? 'justify-center' : ''}`}>
+        <div className={`flex items-center p-2 mb-8 ${isIconOnly ? 'justify-center' : ''}`}>
           <img 
             src={isIconOnly 
               ? "https://raw.githubusercontent.com/Nassim-Tecnologia/brand-assets/refs/heads/main/logo-light-without-bg.png"
               : "https://raw.githubusercontent.com/Nassim-Tecnologia/brand-assets/refs/heads/main/logo-marca-primary-without-bg.png"
             }
             alt="Logo" 
-            className={`${isIconOnly ? 'h-8 w-8' : 'h-8'}`} 
+            className={`${isIconOnly ? 'h-10 w-10' : 'h-8'}`} 
           />
         </div>
         <nav>

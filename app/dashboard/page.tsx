@@ -3,9 +3,10 @@
 import { useUser } from '../contexts/UserContext';
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { User, Users, FileText, BarChart2 } from 'lucide-react';
+import { User, Users, FileText, BarChart2, LogOut } from 'lucide-react';
 import { Button } from "@/components/ui/button"
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { PlusCircle, Settings, List } from 'lucide-react'
 
 interface Stats {
@@ -15,9 +16,19 @@ interface Stats {
 }
 
 export default function Dashboard() {
-  const { user } = useUser();
+  const { user, setUser } = useUser();
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    setUser(null);
+    router.push('/');
+  };
+
+
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -49,14 +60,6 @@ export default function Dashboard() {
 
   if (!user) return null;
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-xl">Loading...</div>
-      </div>
-    );
-  }
-
   const statCards = [
     { 
       title: 'Total Posts', 
@@ -79,7 +82,7 @@ export default function Dashboard() {
   ];
 
   return (
-    <div>
+    <div className="max-w-7xl mx-auto">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
         {statCards.map((card, index) => (
           <Card key={index}>
@@ -117,6 +120,12 @@ export default function Dashboard() {
               <Button variant="secondary" className="w-full justify-start">
                 <Settings className="mr-2 h-4 w-4" />
                 Manage Settings
+              </Button>
+            </Link>
+            <Link href="/dashboard/settings" passHref>
+              <Button variant="secondary" onClick={handleLogout} className="w-full justify-start">
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
               </Button>
             </Link>
           </CardContent>

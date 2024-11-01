@@ -52,7 +52,7 @@ export default function NewsletterPage() {
   }
 
   return (
-    <div>
+    <div className="max-w-7xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Newsletter Subscribers</h1>
         <button

@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useUser } from '@/app/contexts/UserContext';
 import { toast } from 'react-toastify';
+import { User, Lock, Save, KeyRound, Mail, Loader2 } from 'lucide-react';
+import { Separator } from "@/components/ui/separator"
 
 interface FormState {
   values: {
@@ -183,70 +185,132 @@ export default function Settings() {
   };
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Settings</h1>
+    <div className="max-w-7xl mx-auto space-y-8">
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+        <p className="text-muted-foreground">Manage your account settings and preferences.</p>
+      </div>
+
+      <Separator />
 
       <Card>
         <CardHeader>
-          <CardTitle>Profile Settings</CardTitle>
+          <div className="flex items-center gap-2">
+            <User className="h-5 w-5 text-primary" />
+            <CardTitle>Profile Settings</CardTitle>
+          </div>
+          <CardDescription>
+            Update your personal information.
+          </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Name</label>
-            <Input 
-              value={formState.values.name}
-              onChange={(e) => handleInputChange('name', e.target.value)}
-            />
+        <CardContent className="space-y-6">
+          <div className="grid gap-6 sm:grid-cols-2">
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Full Name
+              </label>
+              <Input 
+                value={formState.values.name}
+                onChange={(e) => handleInputChange('name', e.target.value)}
+                placeholder="Enter your name"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Email Address
+              </label>
+              <div className="flex gap-2">
+                <Input value={user?.email || ''} disabled />
+                <Button variant="ghost" size="icon" disabled>
+                  <Mail className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Email</label>
-            <Input value={user?.email || ''} disabled />
+          <div className="flex justify-end">
+            <Button 
+              onClick={handleUpdateProfile}
+              disabled={loading || !formState.dirty.profile}
+              className="min-w-[120px]"
+            >
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  Save Changes
+                </>
+              )}
+            </Button>
           </div>
-          <Button 
-            onClick={handleUpdateProfile}
-            disabled={loading || !formState.dirty.profile}
-          >
-            Save Changes
-          </Button>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Password</CardTitle>
+          <div className="flex items-center gap-2">
+            <Lock className="h-5 w-5 text-primary" />
+            <CardTitle>Security</CardTitle>
+          </div>
+          <CardDescription>
+            Update your password and secure your account.
+          </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Current Password</label>
-            <Input 
-              type="password"
-              value={formState.values.currentPassword}
-              onChange={(e) => handleInputChange('currentPassword', e.target.value)}
-            />
+        <CardContent className="space-y-6">
+          <div className="grid gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none">
+                Current Password
+              </label>
+              <Input 
+                type="password"
+                value={formState.values.currentPassword}
+                onChange={(e) => handleInputChange('currentPassword', e.target.value)}
+                placeholder="Enter current password"
+              />
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none">
+                  New Password
+                </label>
+                <Input 
+                  type="password"
+                  value={formState.values.newPassword}
+                  onChange={(e) => handleInputChange('newPassword', e.target.value)}
+                  placeholder="Enter new password"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none">
+                  Confirm Password
+                </label>
+                <Input 
+                  type="password"
+                  value={formState.values.confirmPassword}
+                  onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                  placeholder="Confirm new password"
+                />
+              </div>
+            </div>
           </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">New Password</label>
-            <Input 
-              type="password"
-              value={formState.values.newPassword}
-              onChange={(e) => handleInputChange('newPassword', e.target.value)}
-            />
+          <div className="flex justify-end">
+            <Button 
+              variant="secondary" 
+              disabled={loading || !formState.dirty.password}
+              onClick={handleChangePassword}
+              className="min-w-[140px]"
+            >
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  <KeyRound className="mr-2 h-4 w-4" />
+                  Change Password
+                </>
+              )}
+            </Button>
           </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Confirm New Password</label>
-            <Input 
-              type="password"
-              value={formState.values.confirmPassword}
-              onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-            />
-          </div>
-          <Button 
-            variant="secondary" 
-            disabled={loading || !formState.dirty.password}
-            onClick={handleChangePassword}
-          >
-            Change Password
-          </Button>
         </CardContent>
       </Card>
     </div>

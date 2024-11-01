@@ -1,17 +1,17 @@
 'use client';
 
+import { useUser } from '@/app/contexts/UserContext';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUser } from './contexts/UserContext';
 import { toast } from 'react-toastify';
 
-export default function Home() {
+export default function LoginPage() {
+  const { user, setUser } = useUser();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
-  const { user, setUser } = useUser();
 
-  // Handle redirection in useEffect instead of during render
+  // Handle authenticated users
   useEffect(() => {
     if (user) {
       router.push('/dashboard');
@@ -61,7 +61,7 @@ export default function Home() {
     }
   };
 
-  // Remove the conditional render and let useEffect handle the redirect
+  // Don't return null, instead show loading or the form
   return (
     <div className="min-h-screen flex items-center justify-center">
       <form onSubmit={handleSubmit} className="space-y-4 w-full max-w-md p-8">
