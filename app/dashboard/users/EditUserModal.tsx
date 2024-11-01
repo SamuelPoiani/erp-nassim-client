@@ -3,6 +3,16 @@
 import { useState, useEffect } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 import { getToken, fetchRoles } from '@/utils/auth';
+import { toast } from 'react-toastify';
+
+type APIError = {
+  message: string;
+  code?: string;
+  validation?: {
+    field: string;
+    message: string;
+  }[];
+};
 
 interface User {
   id: number;
@@ -36,6 +46,7 @@ export default function EditUserModal({ user, isOpen, onClose, onUpdate }: EditU
     password: '',
     roleId: 1
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const loadRoles = async () => {
@@ -58,9 +69,14 @@ export default function EditUserModal({ user, isOpen, onClose, onUpdate }: EditU
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     
     try {
       const token = getToken();
+      if (!token) {
+        throw new Error('Authentication token not found');
+      }
+
       const updateData = Object.fromEntries(
         Object.entries(formData).filter(([_, value]) => value !== '')
       );
@@ -74,14 +90,27 @@ export default function EditUserModal({ user, isOpen, onClose, onUpdate }: EditU
         body: JSON.stringify(updateData)
       });
 
+      const data = await response.json();
+
       if (response.ok) {
+        toast.success('User updated successfully!');
         onUpdate();
+        onClose();
       } else {
-        alert('Failed to update user');
+        const error = data as APIError;
+        if (error.validation?.length) {
+          error.validation.forEach(({ message }) => toast.error(message));
+        } else if (error.message) {
+          toast.error(error.message);
+        } else {
+          toast.error('Failed to update user');
+        }
       }
     } catch (error) {
       console.error('Error updating user:', error);
-      alert('Error updating user');
+      toast.error('Network error: Could not update user');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -106,6 +135,7 @@ export default function EditUserModal({ user, isOpen, onClose, onUpdate }: EditU
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
               className="w-full p-2 border rounded"
               required
+              disabled={isLoading}
             />
           </div>
 
@@ -117,6 +147,7 @@ export default function EditUserModal({ user, isOpen, onClose, onUpdate }: EditU
               onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
               className="w-full p-2 border rounded"
               required
+              disabled={isLoading}
             />
           </div>
 
@@ -127,6 +158,7 @@ export default function EditUserModal({ user, isOpen, onClose, onUpdate }: EditU
               value={formData.password}
               onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
               className="w-full p-2 border rounded"
+              disabled={isLoading}
             />
           </div>
 
@@ -136,6 +168,7 @@ export default function EditUserModal({ user, isOpen, onClose, onUpdate }: EditU
               value={formData.roleId}
               onChange={(e) => setFormData(prev => ({ ...prev, roleId: Number(e.target.value) }))}
               className="w-full p-2 border rounded"
+              disabled={isLoading}
             >
               {roles.map(role => (
                 <option key={role.id} value={role.id}>
@@ -147,9 +180,10 @@ export default function EditUserModal({ user, isOpen, onClose, onUpdate }: EditU
 
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+            className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 disabled:bg-blue-300 disabled:cursor-not-allowed"
+            disabled={isLoading}
           >
-            Update User
+            {isLoading ? 'Updating...' : 'Update User'}
           </button>
         </form>
       </div>

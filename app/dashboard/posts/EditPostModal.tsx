@@ -2,6 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
+import { toast } from 'react-toastify';
+
+type APIError = {
+  message: string;
+  code?: string;
+  validation?: {
+    field: string;
+    message: string;
+  }[];
+};
 
 interface Post {
   id: number;
@@ -19,6 +29,7 @@ interface EditPostModalProps {
 }
 
 export default function EditPostModal({ post, isOpen, onClose, onUpdate }: EditPostModalProps) {
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<Omit<Post, 'id'>>({
     title: '',
     description: '',
@@ -39,12 +50,17 @@ export default function EditPostModal({ post, isOpen, onClose, onUpdate }: EditP
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     
     try {
       const token = document.cookie
         .split('; ')
         .find(row => row.startsWith('token='))
         ?.split('=')[1];
+
+      if (!token) {
+        throw new Error('Authentication token not found');
+      }
 
       const response = await fetch(`http://localhost:3001/api/blog/edit/${post?.id}`, {
         method: 'PUT',
@@ -55,15 +71,27 @@ export default function EditPostModal({ post, isOpen, onClose, onUpdate }: EditP
         body: JSON.stringify(formData)
       });
 
+      const data = await response.json();
+
       if (response.ok) {
+        toast.success('Post updated successfully!');
         onUpdate();
         onClose();
       } else {
-        alert('Failed to update post');
+        const error = data as APIError;
+        if (error.validation?.length) {
+          error.validation.forEach(({ message }) => toast.error(message));
+        } else if (error.message) {
+          toast.error(error.message);
+        } else {
+          toast.error('Failed to update post');
+        }
       }
     } catch (error) {
       console.error('Error updating post:', error);
-      alert('Error updating post');
+      toast.error('Network error: Could not update post');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -88,6 +116,7 @@ export default function EditPostModal({ post, isOpen, onClose, onUpdate }: EditP
               onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
               className="w-full p-2 border rounded"
               required
+              disabled={isLoading}
             />
           </div>
 
@@ -99,6 +128,7 @@ export default function EditPostModal({ post, isOpen, onClose, onUpdate }: EditP
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               className="w-full p-2 border rounded"
               required
+              disabled={isLoading}
             />
           </div>
 
@@ -109,6 +139,7 @@ export default function EditPostModal({ post, isOpen, onClose, onUpdate }: EditP
               value={formData.image}
               onChange={(e) => setFormData(prev => ({ ...prev, image: e.target.value }))}
               className="w-full p-2 border rounded"
+              disabled={isLoading}
             />
           </div>
 
@@ -119,14 +150,16 @@ export default function EditPostModal({ post, isOpen, onClose, onUpdate }: EditP
               onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
               className="w-full p-2 border rounded min-h-[200px]"
               required
+              disabled={isLoading}
             />
           </div>
 
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+            className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 disabled:bg-blue-300 disabled:cursor-not-allowed"
+            disabled={isLoading}
           >
-            Update Post
+            {isLoading ? 'Updating...' : 'Update Post'}
           </button>
         </form>
       </div>

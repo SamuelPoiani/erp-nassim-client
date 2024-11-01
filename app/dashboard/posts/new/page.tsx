@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AiOutlineArrowLeft, AiOutlineDown, AiOutlineUp } from 'react-icons/ai';
+import { toast } from 'react-toastify';
 
 interface PostData {
   title: string;
@@ -39,6 +40,11 @@ export default function NewPost() {
   });
 
   const generateContent = async () => {
+    if (!url) {
+      toast.error('Please enter a URL to generate content');
+      return;
+    }
+
     setLoading(true);
     try {
       const token = document.cookie
@@ -46,7 +52,10 @@ export default function NewPost() {
         .find(row => row.startsWith('token='))
         ?.split('=')[1];
 
-      // Properly structure the payload
+      if (!token) {
+        throw new Error('Authentication token not found');
+      }
+
       const payload = {
         urls: [url],
         llm: null, // Keep as null
@@ -57,9 +66,6 @@ export default function NewPost() {
         temperature: generateOptions.temperature
       };
 
-      // Log the payload being sent
-      console.log('Sending to server:', payload);
-
       const response = await fetch('http://localhost:3001/api/generate', {
         method: 'POST',
         headers: {
@@ -69,20 +75,20 @@ export default function NewPost() {
         body: JSON.stringify(payload),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        if (data.result) {
-          setPostData(prev => ({
-            ...prev,
-            content: data.result
-          }));
-        }
+      const data = await response.json();
+
+      if (response.ok && data.result) {
+        setPostData(prev => ({
+          ...prev,
+          content: data.result
+        }));
+        toast.success('Content generated successfully!');
       } else {
-        alert('Failed to generate content');
+        toast.error(data.message || 'Failed to generate content');
       }
     } catch (error) {
       console.error('Error generating content:', error);
-      alert('Error generating content');
+      toast.error('Network error: Could not generate content');
     } finally {
       setLoading(false);
     }
@@ -98,6 +104,10 @@ export default function NewPost() {
         .find(row => row.startsWith('token='))
         ?.split('=')[1];
 
+      if (!token) {
+        throw new Error('Authentication token not found');
+      }
+
       const response = await fetch('http://localhost:3001/api/blog/posts', {
         method: 'POST',
         headers: {
@@ -107,14 +117,17 @@ export default function NewPost() {
         body: JSON.stringify(postData)
       });
 
+      const data = await response.json();
+
       if (response.ok) {
+        toast.success('Post created successfully!');
         router.push('/dashboard/posts');
       } else {
-        alert('Failed to create post');
+        toast.error(data.message || 'Failed to create post');
       }
     } catch (error) {
       console.error('Error creating post:', error);
-      alert('Error creating post');
+      toast.error('Network error: Could not create post');
     } finally {
       setLoading(false);
     }
@@ -154,9 +167,9 @@ export default function NewPost() {
             <button
               onClick={generateContent}
               disabled={loading || !url}
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:bg-gray-300"
+              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
-              Generate
+              {loading ? 'Generating...' : 'Generate'}
             </button>
           </div>
 
@@ -289,7 +302,7 @@ export default function NewPost() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 disabled:bg-gray-300"
+            className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 disabled:bg-blue-300 disabled:cursor-not-allowed"
           >
             {loading ? 'Creating...' : 'Create Post'}
           </button>

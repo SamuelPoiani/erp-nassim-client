@@ -3,6 +3,16 @@
 import { useState, useEffect } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 import { getToken, fetchRoles } from '@/utils/auth';
+import { toast } from 'react-toastify';
+
+type APIError = {
+  message: string;
+  code?: string;
+  validation?: {
+    field: string;
+    message: string;
+  }[];
+};
 
 interface Role {
   id: number;
@@ -24,6 +34,7 @@ export default function CreateUserModal({ isOpen, onClose, onCreate }: CreateUse
     password: '',
     roleId: 1
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const loadRoles = async () => {
@@ -35,10 +46,15 @@ export default function CreateUserModal({ isOpen, onClose, onCreate }: CreateUse
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     
     try {
       const token = getToken();
-      const response = await fetch('http://localhost:3001/api/auth/user', {
+      if (!token) {
+        throw new Error('Authentication token not found');
+      }
+
+      const response = await fetch('http://localhost:3001/api/auth/user/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -47,16 +63,28 @@ export default function CreateUserModal({ isOpen, onClose, onCreate }: CreateUse
         body: JSON.stringify(formData)
       });
 
+      const data = await response.json();
+
       if (response.ok) {
+        toast.success('User created successfully!');
         onCreate();
-        setFormData({ name: '', email: '', password: '', roleId: 1 }); // Reset form
+        onClose();
+        setFormData({ name: '', email: '', password: '', roleId: 1 });
       } else {
-        const error = await response.json();
-        alert(error.message || 'Failed to create user');
+        const error = data as APIError;
+        if (error.validation?.length) {
+          error.validation.forEach(({ message }) => toast.error(message));
+        } else if (error.message) {
+          toast.error(error.message);
+        } else {
+          toast.error('Failed to create user');
+        }
       }
     } catch (error) {
       console.error('Error creating user:', error);
-      alert('Error creating user');
+      toast.error('Network error: Could not create user');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -81,6 +109,7 @@ export default function CreateUserModal({ isOpen, onClose, onCreate }: CreateUse
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
               className="w-full p-2 border rounded"
               required
+              disabled={isLoading}
             />
           </div>
 
@@ -92,6 +121,7 @@ export default function CreateUserModal({ isOpen, onClose, onCreate }: CreateUse
               onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
               className="w-full p-2 border rounded"
               required
+              disabled={isLoading}
             />
           </div>
 
@@ -103,6 +133,7 @@ export default function CreateUserModal({ isOpen, onClose, onCreate }: CreateUse
               onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
               className="w-full p-2 border rounded"
               required
+              disabled={isLoading}
             />
           </div>
 
@@ -112,6 +143,7 @@ export default function CreateUserModal({ isOpen, onClose, onCreate }: CreateUse
               value={formData.roleId}
               onChange={(e) => setFormData(prev => ({ ...prev, roleId: Number(e.target.value) }))}
               className="w-full p-2 border rounded"
+              disabled={isLoading}
             >
               {roles.map(role => (
                 <option key={role.id} value={role.id}>
@@ -123,9 +155,10 @@ export default function CreateUserModal({ isOpen, onClose, onCreate }: CreateUse
 
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+            className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 disabled:bg-blue-300 disabled:cursor-not-allowed"
+            disabled={isLoading}
           >
-            Create User
+            {isLoading ? 'Creating...' : 'Create User'}
           </button>
         </form>
       </div>
