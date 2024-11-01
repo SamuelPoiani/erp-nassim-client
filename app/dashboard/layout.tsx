@@ -4,7 +4,7 @@ import { useUser } from '../contexts/UserContext';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Button } from "@/components/ui/button"
-import { Settings, Menu, Sidebar as SidebarIcon, Bell, Mail, Calendar, User, FileText, Users, Home, ChevronDown, Power } from 'lucide-react';
+import { Settings, Menu, Sidebar as SidebarIcon, Bell, Mail, Calendar, User, FileText, Users, Home, ChevronDown, LogOut } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -91,7 +91,7 @@ export default function DashboardLayout({
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="w-full overflow-hidden">
         {/* Navbar */}
         <header className="bg-white shadow-sm">
           <div className="flex items-center justify-between p-4">
@@ -145,7 +145,7 @@ export default function DashboardLayout({
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem className='cursor-pointer' onClick={handleLogout}>
-                    <Power className="mr-2 h-4 w-4" />
+                    <LogOut className="mr-2 h-4 w-4" />
                     <span>Log out</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -155,7 +155,7 @@ export default function DashboardLayout({
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+        <main className="max-w-7xl mx-auto overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
           {children}
         </main>
       </div>
