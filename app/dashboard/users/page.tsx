@@ -5,6 +5,7 @@ import { AiOutlineEdit, AiOutlinePlus } from 'react-icons/ai';
 import EditUserModal from '@/app/dashboard/users/EditUserModal';
 import CreateUserModal from '@/app/dashboard/users/CreateUserModal';
 import Link from 'next/link';
+import { getToken, fetchRoles } from '@/utils/auth';
 
 interface User {
   id: number;
@@ -18,8 +19,15 @@ interface User {
   createdAt: string;
 }
 
+interface Role {
+  id: number;
+  name: string;
+  description: string;
+}
+
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -27,11 +35,7 @@ export default function UsersPage() {
 
   const fetchUsers = async () => {
     try {
-      const token = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('token='))
-        ?.split('=')[1];
-
+      const token = getToken();
       const response = await fetch('http://localhost:3001/api/users', {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -50,7 +54,12 @@ export default function UsersPage() {
   };
 
   useEffect(() => {
-    fetchUsers();
+    const loadData = async () => {
+      const rolesData = await fetchRoles();
+      setRoles(rolesData);
+      await fetchUsers();
+    };
+    loadData();
   }, []);
 
   if (loading) {
@@ -63,16 +72,8 @@ export default function UsersPage() {
 
   const getRoleName = (user: User) => {
     if (user.role?.name) return user.role.name;
-    
-    // Fallback based on roleId
-    switch (user.roleId) {
-      case 2:
-        return 'Admin';
-      case 3:
-        return 'Ceo';
-      default:
-        return 'Staff';
-    }
+    const role = roles.find(r => r.id === user.roleId);
+    return role ? role.name : 'Unknown';
   };
 
   return (

@@ -1,7 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
+import { getToken, fetchRoles } from '@/utils/auth';
+
+interface Role {
+  id: number;
+  name: string;
+  description: string;
+}
 
 interface CreateUserModalProps {
   isOpen: boolean;
@@ -10,6 +17,7 @@ interface CreateUserModalProps {
 }
 
 export default function CreateUserModal({ isOpen, onClose, onCreate }: CreateUserModalProps) {
+  const [roles, setRoles] = useState<Role[]>([]);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -17,15 +25,19 @@ export default function CreateUserModal({ isOpen, onClose, onCreate }: CreateUse
     roleId: 1
   });
 
+  useEffect(() => {
+    const loadRoles = async () => {
+      const rolesData = await fetchRoles();
+      setRoles(rolesData);
+    };
+    loadRoles();
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     try {
-      const token = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('token='))
-        ?.split('=')[1];
-
+      const token = getToken();
       const response = await fetch('http://localhost:3001/api/auth/user', {
         method: 'POST',
         headers: {
@@ -101,9 +113,11 @@ export default function CreateUserModal({ isOpen, onClose, onCreate }: CreateUse
               onChange={(e) => setFormData(prev => ({ ...prev, roleId: Number(e.target.value) }))}
               className="w-full p-2 border rounded"
             >
-              <option value={1}>Staff</option>
-              <option value={2}>Admin</option>
-              <option value={3}>Ceo</option>
+              {roles.map(role => (
+                <option key={role.id} value={role.id}>
+                  {role.name.charAt(0).toUpperCase() + role.name.slice(1)}
+                </option>
+              ))}
             </select>
           </div>
 

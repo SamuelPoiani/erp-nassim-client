@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
+import { getToken, fetchRoles } from '@/utils/auth';
 
 interface User {
   id: number;
@@ -14,6 +15,12 @@ interface User {
   };
 }
 
+interface Role {
+  id: number;
+  name: string;
+  description: string;
+}
+
 interface EditUserModalProps {
   user: User | null;
   isOpen: boolean;
@@ -22,12 +29,21 @@ interface EditUserModalProps {
 }
 
 export default function EditUserModal({ user, isOpen, onClose, onUpdate }: EditUserModalProps) {
+  const [roles, setRoles] = useState<Role[]>([]);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
     roleId: 1
   });
+
+  useEffect(() => {
+    const loadRoles = async () => {
+      const rolesData = await fetchRoles();
+      setRoles(rolesData);
+    };
+    loadRoles();
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -44,12 +60,7 @@ export default function EditUserModal({ user, isOpen, onClose, onUpdate }: EditU
     e.preventDefault();
     
     try {
-      const token = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('token='))
-        ?.split('=')[1];
-
-      // Only include fields that have values
+      const token = getToken();
       const updateData = Object.fromEntries(
         Object.entries(formData).filter(([_, value]) => value !== '')
       );
@@ -126,9 +137,11 @@ export default function EditUserModal({ user, isOpen, onClose, onUpdate }: EditU
               onChange={(e) => setFormData(prev => ({ ...prev, roleId: Number(e.target.value) }))}
               className="w-full p-2 border rounded"
             >
-              <option value={1}>Staff</option>
-              <option value={2}>Admin</option>
-              <option value={3}>Ceo</option>
+              {roles.map(role => (
+                <option key={role.id} value={role.id}>
+                  {role.name.charAt(0).toUpperCase() + role.name.slice(1)}
+                </option>
+              ))}
             </select>
           </div>
 
