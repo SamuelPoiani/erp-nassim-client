@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
-import { getToken, fetchRoles } from '@/utils/auth';
+import { getToken } from '@/utils/auth';
+import { fetchRoles } from '@/utils/roleApi';
 import { toast } from 'react-toastify';
 
 type APIError = {

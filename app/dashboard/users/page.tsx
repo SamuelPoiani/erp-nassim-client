@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { AiOutlineEdit, AiOutlinePlus } from 'react-icons/ai';
 import EditUserModal from '@/app/dashboard/users/EditUserModal';
 import CreateUserModal from '@/app/dashboard/users/CreateUserModal';
-import { getToken, fetchRoles } from '@/utils/auth';
+import { getToken } from '@/utils/auth';
+import { fetchRoles } from '@/utils/roleApi';
 
 interface User {
   id: number;
