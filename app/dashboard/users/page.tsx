@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { AiOutlineEdit, AiOutlinePlus } from 'react-icons/ai';
 import EditUserModal from '@/app/dashboard/users/EditUserModal';
 import CreateUserModal from '@/app/dashboard/users/CreateUserModal';
-import Link from 'next/link';
 import { getToken, fetchRoles } from '@/utils/auth';
 
 interface User {

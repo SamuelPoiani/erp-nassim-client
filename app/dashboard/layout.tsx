@@ -44,7 +44,7 @@ export default function DashboardLayout({
   ];
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="min-h-screen flex bg-gray-100">
       {/* Backdrop for mobile */}
       <div 
         className={`fixed inset-0 bg-black/50 z-20 md:hidden ${
@@ -55,10 +55,11 @@ export default function DashboardLayout({
 
       {/* Sidebar */}
       <aside 
-        className={`fixed md:static bg-[#283046] text-white ${isIconOnly ? 'w-17' : 'w-64'} min-h-screen p-4 
-          transition-all duration-200 ease-in-out z-30
-          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
-          md:translate-x-0`}
+        className={`fixed md:sticky top-0 h-screen bg-[#283046] text-white ${
+          isIconOnly ? 'w-17' : 'w-64'
+        } p-4 transition-all duration-200 ease-in-out z-30 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        } md:translate-x-0`}
       >
         <div className={`flex items-center p-2 mb-8 ${isIconOnly ? 'justify-center' : ''}`}>
           <img 
@@ -90,10 +91,10 @@ export default function DashboardLayout({
         </nav>
       </aside>
 
-      {/* Main Content */}
-      <div className="w-full overflow-hidden">
+      {/* Main Content Container */}
+      <div className="flex-1 flex flex-col min-h-screen">
         {/* Navbar */}
-        <header className="bg-white shadow-sm">
+        <header className="bg-white shadow-sm sticky top-0 z-10">
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center space-x-2">
               <button 
@@ -155,8 +156,10 @@ export default function DashboardLayout({
         </header>
 
         {/* Page Content */}
-        <main className="max-w-7xl mx-auto overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
-          {children}
+        <main className="flex-1 overflow-auto p-6">
+          <div className="max-w-7xl mx-auto">
+            {children}
+          </div>
         </main>
       </div>
     </div>
