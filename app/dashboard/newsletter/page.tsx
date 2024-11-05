@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { AiOutlinePlus } from 'react-icons/ai';
+import { AiOutlinePlus, AiOutlineDelete } from 'react-icons/ai';
 import CreateNewsletterModal from '@/app/dashboard/newsletter/CreateNewsletterModal';
 
 interface Newsletter {
@@ -22,7 +22,7 @@ export default function NewsletterPage() {
         .find(row => row.startsWith('token='))
         ?.split('=')[1];
 
-      const response = await fetch('http://localhost:3001/api/newsletter', {
+      const response = await fetch('http://localhost:3001/api/newsletter/', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -42,6 +42,30 @@ export default function NewsletterPage() {
   useEffect(() => {
     fetchNewsletters();
   }, []);
+
+  const deleteNewsletter = async (email: string) => {
+    try {
+      const token = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('token='))
+        ?.split('=')[1];
+      // TODO: add email to the url
+      const response = await fetch(`http://localhost:3001/api/newsletter/delete/${email}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email })
+      });
+
+      if (response.ok) {
+        fetchNewsletters();
+      }
+    } catch (error) {
+      console.error('Error deleting newsletter:', error);
+    }
+  };
 
   if (loading) {
     return (
@@ -74,6 +98,9 @@ export default function NewsletterPage() {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Subscribed Date
               </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -84,6 +111,14 @@ export default function NewsletterPage() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {new Date(newsletter.createdAt).toLocaleDateString()}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <button
+                    onClick={() => deleteNewsletter(newsletter.email)}
+                    className="text-red-600 hover:text-red-900"
+                  >
+                    <AiOutlineDelete className="w-5 h-5" />
+                  </button>
                 </td>
               </tr>
             ))}
