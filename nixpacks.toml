@@ -1,8 +1,8 @@
 [phases.setup]
-nixPkgs = ['npm i --force']
+cmd = ['npm i --force']
 
-[build]
-command = 'npm run build'
+[phases.build]
+cmd = 'npm run build'
 
-[run]
-command = 'npm run start'
+[start]
+cmd =  'npm run start'
