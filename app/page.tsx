@@ -10,7 +10,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
-
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
   // Handle authenticated users
   useEffect(() => {
     if (user) {
@@ -22,7 +22,7 @@ export default function LoginPage() {
     e.preventDefault();
     
     try {
-      const response = await fetch('http://localhost:3001/api/auth/user/login', {
+      const response = await fetch(`${backendUrl}/api/auth/user/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -38,7 +38,7 @@ export default function LoginPage() {
         document.cookie = `token=${token}; path=/; SameSite=Lax`;
 
         // Fetch user data after successful login
-        const userResponse = await fetch('http://localhost:3001/api/auth/user/', {
+        const userResponse = await fetch(`${backendUrl}/api/auth/user/`, {
           headers: {
             'Authorization': `Bearer ${token}`
           },

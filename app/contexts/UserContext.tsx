@@ -22,6 +22,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   const updateUserData = async () => {
     try {
@@ -35,7 +36,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      const response = await fetch('http://localhost:3001/api/auth/user', {
+      const response = await fetch(`${backendUrl}/api/auth/user`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

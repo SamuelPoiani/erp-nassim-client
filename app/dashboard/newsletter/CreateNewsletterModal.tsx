@@ -22,6 +22,7 @@ type APIError = {
 export default function CreateNewsletterModal({ isOpen, onClose, onCreate }: CreateNewsletterModalProps) {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -48,7 +49,7 @@ export default function CreateNewsletterModal({ isOpen, onClose, onCreate }: Cre
         throw new Error('Authentication token not found');
       }
 
-      const response = await fetch('http://localhost:3001/api/newsletter/subscribe', {
+      const response = await fetch(`${backendUrl}/api/newsletter/subscribe`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

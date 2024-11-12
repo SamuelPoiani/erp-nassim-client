@@ -48,6 +48,7 @@ export default function Settings() {
       password: false
     }
   });
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   // Sync form data with user context
   useEffect(() => {
@@ -105,7 +106,7 @@ export default function Settings() {
         .find(row => row.startsWith('token='))
         ?.split('=')[1];
 
-      const response = await fetch(`http://localhost:3001/api/users/edit/`, {
+      const response = await fetch(`${backendUrl}/api/users/edit/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -157,7 +158,7 @@ export default function Settings() {
         .find(row => row.startsWith('token='))
         ?.split('=')[1];
 
-      const response = await fetch(`http://localhost:3001/api/users/edit/`, {
+      const response = await fetch(`${backendUrl}/api/users/edit/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

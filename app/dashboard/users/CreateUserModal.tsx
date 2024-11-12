@@ -36,6 +36,7 @@ export default function CreateUserModal({ isOpen, onClose, onCreate }: CreateUse
     roleId: 1
   });
   const [isLoading, setIsLoading] = useState(false);
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   useEffect(() => {
     const loadRoles = async () => {
@@ -55,7 +56,7 @@ export default function CreateUserModal({ isOpen, onClose, onCreate }: CreateUse
         throw new Error('Authentication token not found');
       }
 
-      const response = await fetch('http://localhost:3001/api/auth/user/register', {
+      const response = await fetch(`${backendUrl}/api/auth/user/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

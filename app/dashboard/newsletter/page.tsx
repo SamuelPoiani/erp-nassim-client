@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { AiOutlinePlus, AiOutlineDelete } from 'react-icons/ai';
 import CreateNewsletterModal from '@/app/dashboard/newsletter/CreateNewsletterModal';
+import { toast } from 'react-toastify';
 
 interface Newsletter {
   id: number;
@@ -14,6 +15,7 @@ export default function NewsletterPage() {
   const [newsletters, setNewsletters] = useState<Newsletter[]>([]);
   const [loading, setLoading] = useState(true);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   const fetchNewsletters = async () => {
     try {
@@ -22,7 +24,7 @@ export default function NewsletterPage() {
         .find(row => row.startsWith('token='))
         ?.split('=')[1];
 
-      const response = await fetch('http://localhost:3001/api/newsletter/', {
+      const response = await fetch(`${backendUrl}/api/newsletter/`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -49,8 +51,7 @@ export default function NewsletterPage() {
         .split('; ')
         .find(row => row.startsWith('token='))
         ?.split('=')[1];
-      // TODO: add email to the url
-      const response = await fetch(`http://localhost:3001/api/newsletter/delete/${email}`, {
+      const response = await fetch(`${backendUrl}/api/newsletter/unsubscribe/`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -60,10 +61,15 @@ export default function NewsletterPage() {
       });
 
       if (response.ok) {
+        toast.success('Subscriber removed successfully!');
         fetchNewsletters();
+      } else {
+        const data = await response.json();
+        toast.error(data.message || 'Failed to remove subscriber');
       }
     } catch (error) {
       console.error('Error deleting newsletter:', error);
+      toast.error('Network error: Could not remove subscriber');
     }
   };
 

@@ -31,6 +31,7 @@ export default function Posts() {
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   const fetchPosts = async () => {
     try {
@@ -39,7 +40,7 @@ export default function Posts() {
         .find(row => row.startsWith('token='))
         ?.split('=')[1];
 
-      const response = await fetch('http://localhost:3001/api/blog/posts', {
+      const response = await fetch(`${backendUrl}/api/blog/posts`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

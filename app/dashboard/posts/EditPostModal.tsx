@@ -36,6 +36,7 @@ export default function EditPostModal({ post, isOpen, onClose, onUpdate }: EditP
     content: '',
     image: ''
   });
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   useEffect(() => {
     if (post) {
@@ -62,7 +63,7 @@ export default function EditPostModal({ post, isOpen, onClose, onUpdate }: EditP
         throw new Error('Authentication token not found');
       }
 
-      const response = await fetch(`http://localhost:3001/api/blog/edit/${post?.id}`, {
+      const response = await fetch(`${backendUrl}/api/blog/edit/${post?.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

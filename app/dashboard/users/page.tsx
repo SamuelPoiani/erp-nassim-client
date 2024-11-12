@@ -32,11 +32,12 @@ export default function UsersPage() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   const fetchUsers = async () => {
     try {
       const token = getToken();
-      const response = await fetch('http://localhost:3001/api/users', {
+      const response = await fetch(`${backendUrl}/api/users`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

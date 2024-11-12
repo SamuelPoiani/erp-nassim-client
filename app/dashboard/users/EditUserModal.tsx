@@ -48,6 +48,7 @@ export default function EditUserModal({ user, isOpen, onClose, onUpdate }: EditU
     roleId: 1
   });
   const [isLoading, setIsLoading] = useState(false);
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   useEffect(() => {
     const loadRoles = async () => {
@@ -82,7 +83,7 @@ export default function EditUserModal({ user, isOpen, onClose, onUpdate }: EditU
         Object.entries(formData).filter(([_, value]) => value !== '')
       );
 
-      const response = await fetch(`http://localhost:3001/api/users/edit/${user?.id}`, {
+      const response = await fetch(`${backendUrl}/api/users/edit/${user?.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

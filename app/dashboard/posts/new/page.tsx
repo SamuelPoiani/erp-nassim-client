@@ -38,6 +38,7 @@ export default function NewPost() {
     custom_prompt: [],
     temperature: "0.70"
   });
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   const generateContent = async () => {
     if (!url) {
@@ -66,7 +67,7 @@ export default function NewPost() {
         temperature: generateOptions.temperature
       };
 
-      const response = await fetch('http://localhost:3001/api/generate', {
+      const response = await fetch(`${backendUrl}/api/generate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -108,7 +109,7 @@ export default function NewPost() {
         throw new Error('Authentication token not found');
       }
 
-      const response = await fetch('http://localhost:3001/api/blog/posts', {
+      const response = await fetch(`${backendUrl}/api/blog/posts`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

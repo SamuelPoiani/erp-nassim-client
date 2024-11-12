@@ -19,8 +19,8 @@ export default function Dashboard() {
   const { user, setUser } = useUser();
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
-
   const router = useRouter();
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   const handleLogout = async () => {
     document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
@@ -38,7 +38,7 @@ export default function Dashboard() {
           .find(row => row.startsWith('token='))
           ?.split('=')[1];
 
-        const response = await fetch('http://localhost:3001/api/stats', {
+        const response = await fetch(`${backendUrl}/api/stats`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }

@@ -1,9 +1,10 @@
 import { getToken } from './auth';
 
 export const fetchRoles = async () => {
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
     try {
       const token = getToken();
-      const response = await fetch('http://localhost:3001/api/roles', {
+      const response = await fetch(`${backendUrl}/api/roles`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
