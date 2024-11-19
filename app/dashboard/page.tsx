@@ -1,13 +1,10 @@
 'use client';
-
 import { useUser } from '../contexts/UserContext';
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { User, Users, FileText, BarChart2, LogOut } from 'lucide-react';
-import { Button } from "@/components/ui/button"
+import { FiFileText, FiUsers, FiLogOut, FiSettings, FiPlusCircle, FiList } from 'react-icons/fi';
+import { HiOutlineChartBar } from 'react-icons/hi';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { PlusCircle, Settings, List } from 'lucide-react'
 
 interface Stats {
   totalPosts: number;
@@ -28,8 +25,6 @@ export default function Dashboard() {
     router.push('/');
   };
 
-
-
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -39,6 +34,7 @@ export default function Dashboard() {
           ?.split('=')[1];
 
         const response = await fetch(`${backendUrl}/api/stats`, {
+          cache: 'force-cache',
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -64,19 +60,19 @@ export default function Dashboard() {
     { 
       title: 'Total Posts', 
       value: stats?.totalPosts || 0,
-      icon: <FileText size={24} className="text-blue-500" />,
+      icon: <FiFileText size={24} className="text-blue-500" />,
       change: '+12%'
     },
     { 
       title: 'Newsletter Subscribers', 
       value: stats?.totalNewsletterSubscribers || 0,
-      icon: <BarChart2 size={24} className="text-green-500" />,
+      icon: <HiOutlineChartBar size={24} className="text-green-500" />,
       change: '+25%'
     },
     { 
       title: 'Total Users', 
       value: stats?.totalUsers || 0,
-      icon: <Users size={24} className="text-orange-500" />,
+      icon: <FiUsers size={24} className="text-orange-500" />,
       change: '+8%'
     }
   ];
@@ -85,72 +81,72 @@ export default function Dashboard() {
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
         {statCards.map((card, index) => (
-          <Card key={index}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
+          <div key={index} className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center justify-between pb-2">
+              <h3 className="text-sm font-medium text-gray-600">{card.title}</h3>
               {card.icon}
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{card.value}</div>
-              {/* <p className="text-xs text-muted-foreground">{card.change} from last month</p> */}
-            </CardContent>
-          </Card>
+            </div>
+            <div className="pt-2">
+              <div className="text-2xl font-bold text-gray-900">{card.value}</div>
+              {/* <p className="text-xs text-gray-500">{card.change} from last month</p> */}
+            </div>
+          </div>
         ))}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col space-y-3">
-            <Link href="/dashboard/posts/new" passHref>
-              <Button variant="secondary" className="w-full justify-start">
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Create New Post
-              </Button>
+        {/* Quick Actions Card */}
+        <div className="bg-white rounded-lg shadow-sm">
+          <div className="p-6 border-b border-gray-100">
+            <h3 className="text-lg font-semibold text-gray-900">Quick Actions</h3>
+          </div>
+          <div className="p-6 space-y-3">
+            <Link href="/dashboard/posts/new" 
+              className="flex items-center w-full px-4 py-2 text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+              <FiPlusCircle className="mr-2 h-4 w-4" />
+              Create New Post
             </Link>
-            <Link href="/dashboard/posts" passHref>
-              <Button variant="secondary" className="w-full justify-start">
-                <List className="mr-2 h-4 w-4" />
-                View All Posts
-              </Button>
+            <Link href="/dashboard/posts"
+              className="flex items-center w-full px-4 py-2 text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+              <FiList className="mr-2 h-4 w-4" />
+              View All Posts
             </Link>
-            <Link href="/dashboard/settings" passHref>
-              <Button variant="secondary" className="w-full justify-start">
-                <Settings className="mr-2 h-4 w-4" />
-                Manage Settings
-              </Button>
+            <Link href="/dashboard/settings"
+              className="flex items-center w-full px-4 py-2 text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+              <FiSettings className="mr-2 h-4 w-4" />
+              Manage Settings
             </Link>
-            <Link href="/dashboard/settings" passHref>
-              <Button variant="secondary" onClick={handleLogout} className="w-full justify-start">
-                <LogOut className="mr-2 h-4 w-4" />
-                Logout
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Account Information</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <div className="flex flex-col space-y-1">
-              <span className="text-sm font-medium">Email</span>
-              <span className="text-sm text-muted-foreground">{user.email}</span>
+            <button
+              onClick={handleLogout}
+              className="flex items-center w-full px-4 py-2 text-red-600 bg-gray-50 rounded-lg hover:bg-red-50 transition-colors">
+              <FiLogOut className="mr-2 h-4 w-4" />
+              Logout
+            </button>
+          </div>
+        </div>
+
+        {/* Account Information Card */}
+        <div className="bg-white rounded-lg shadow-sm">
+          <div className="p-6 border-b border-gray-100">
+            <h3 className="text-lg font-semibold text-gray-900">Account Information</h3>
+          </div>
+          <div className="p-6 space-y-4">
+            <div className="space-y-1">
+              <span className="text-sm font-medium text-gray-600">Email</span>
+              <p className="text-sm text-gray-500">{user.email}</p>
             </div>
-            <div className="flex flex-col space-y-1">
-              <span className="text-sm font-medium">Member since</span>
-              <span className="text-sm text-muted-foreground">
+            <div className="space-y-1">
+              <span className="text-sm font-medium text-gray-600">Member since</span>
+              <p className="text-sm text-gray-500">
                 {new Date(user.createdAt).toLocaleDateString('en-US', {
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric'
                 })}
-              </span>
+              </p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );

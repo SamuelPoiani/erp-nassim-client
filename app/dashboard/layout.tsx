@@ -3,17 +3,8 @@
 import { useUser } from '../contexts/UserContext';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { Button } from "@/components/ui/button"
-import { Settings, Menu, Sidebar as SidebarIcon, Bell, Mail, Calendar, User, FileText, Users, Home, ChevronDown, LogOut } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { HiOutlineMenu, HiOutlineBell, HiOutlineMail, HiOutlineCalendar, HiOutlineUser, HiOutlineChevronDown } from 'react-icons/hi';
+import { FiHome, FiFileText, FiUsers, FiLogOut } from 'react-icons/fi';
 import Link from 'next/link';
 
 export default function DashboardLayout({
@@ -21,10 +12,11 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, setUser, loading } = useUser();
+  const { user, setUser } = useUser();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isIconOnly, setIsIconOnly] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
@@ -37,10 +29,10 @@ export default function DashboardLayout({
   }
 
   const navigation = [
-    { icon: <Home size={20} />, label: 'Dashboard', href: '/dashboard' },
-    { icon: <FileText size={20} />, label: 'Posts', href: '/dashboard/posts' },
-    { icon: <Users size={20} />, label: 'Users', href: '/dashboard/users' },
-    { icon: <Mail size={20} />, label: 'Newsletter', href: '/dashboard/newsletter' },
+    { icon: <FiHome size={20} />, label: 'Dashboard', href: '/dashboard' },
+    { icon: <FiFileText size={20} />, label: 'Posts', href: '/dashboard/posts' },
+    { icon: <FiUsers size={20} />, label: 'Users', href: '/dashboard/users' },
+    { icon: <HiOutlineMail size={20} />, label: 'Newsletter', href: '/dashboard/newsletter' },
   ];
 
   return (
@@ -98,68 +90,62 @@ export default function DashboardLayout({
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center space-x-2">
               <button 
-                onClick={() => setSidebarOpen(!sidebarOpen)} 
-                className="text-gray-500 focus:outline-none focus:text-gray-700 md:hidden"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="p-2 rounded-lg hover:bg-gray-100 md:hidden"
               >
-                <Menu size={24} />
+                <HiOutlineMenu size={20} />
               </button>
-              <Button
-                variant="ghost"
-                size="icon"
+              <button
                 onClick={() => setIsIconOnly(!isIconOnly)}
-                className="hidden md:flex"
-                title={isIconOnly ? "Expand sidebar" : "Collapse sidebar"}
+                className="p-2 rounded-lg hover:bg-gray-100 hidden md:block"
               >
-                <SidebarIcon size={20} />
-              </Button>
+                <HiOutlineMenu size={20} />
+              </button>
             </div>
-            
+
+            {/* Right side navbar items */}
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="icon">
-                <Bell size={20} />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <Mail size={20} />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <Calendar size={20} />
-              </Button>
+              <button className="p-2 rounded-lg hover:bg-gray-100">
+                <HiOutlineBell size={20} />
+              </button>
               
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center space-x-2">
-                    <User size={20} />
-                    <span>{user.name}</span>
-                    <ChevronDown size={16} />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem className='cursor-pointer' asChild>
-                      <Link href="/dashboard/settings" className="w-full">
-                        <Settings className="mr-2 h-4 w-4" />
-                        <span>Settings</span>
-                      </Link>
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className='cursor-pointer' onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {/* User menu */}
+              <div className="relative">
+                <button 
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100"
+                >
+                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                    <HiOutlineUser size={20} />
+                  </div>
+                  <span>{user.name}</span>
+                  <HiOutlineChevronDown size={16} />
+                </button>
+
+                {/* Dropdown menu */}
+                {userMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50">
+                    <div className="px-4 py-2 text-sm text-gray-500">
+                      {user.email}
+                    </div>
+                    <div className="h-px bg-gray-200 my-1"></div>
+                    <button 
+                      onClick={handleLogout}
+                      className="w-full flex items-center space-x-2 px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                    >
+                      <FiLogOut size={16} />
+                      <span>Logout</span>
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </header>
 
-        {/* Page Content */}
-        <main className="flex-1 overflow-auto p-6">
-          <div className="max-w-7xl mx-auto">
-            {children}
-          </div>
+        {/* Main Content */}
+        <main className="flex-1 p-6">
+          {children}
         </main>
       </div>
     </div>
